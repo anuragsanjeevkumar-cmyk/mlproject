@@ -23,23 +23,42 @@ def save_object(file_path,obj):
         raise CustomException(e,sys)
 
 
-def evaluate_model(X_train, y_train, X_test, y_test, models):
+from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
+
+def evaluate_model(X_train, y_train, X_test, y_test,
+                   models, param):
 
     try:
+
         report = {}
 
         for model_name, model in models.items():
 
-            # Train model
+            para = param[model_name]
+
+            # Hyperparameter Tuning
+            gs = GridSearchCV(
+                model,
+                para,
+                cv=3
+            )
+
+            gs.fit(X_train, y_train)
+
+            # Set best parameters
+            model.set_params(**gs.best_params_)
+
+            # Train model with best parameters
             model.fit(X_train, y_train)
 
             # Prediction
             y_pred = model.predict(X_test)
 
-            # Calculate score
+            # R2 Score
             score = r2_score(y_test, y_pred)
 
-            # Store result
+            # Save score
             report[model_name] = score
 
         return report

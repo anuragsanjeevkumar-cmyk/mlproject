@@ -13,6 +13,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import r2_score
 from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
+from sklearn.model_selection import GridSearchCV
 
 from src.exception import CustomException
 from src.logger import logging
@@ -47,7 +48,46 @@ class  ModelTrainer:
                 "AdaBoost Regressor": AdaBoostRegressor(),
                 "KNeighbors Regressor": KNeighborsRegressor()
             }
-            model_report:dict=evaluate_model(X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,models=models)
+            params = {
+                "Decision Tree": {
+                "criterion": ["squared_error", "friedman_mse"],
+                "splitter": ["best", "random"]
+                },
+
+                "Random Forest": {
+                "n_estimators": [8, 16, 32, 64, 128, 256]
+                },
+
+                "Gradient Boosting": {
+                "learning_rate": [0.01, 0.05, 0.1],
+                "subsample": [0.6, 0.7, 0.8],
+                "n_estimators": [8, 16, 32, 64, 128, 256]
+                },
+
+                "Linear Regression": {},
+
+                "XGBRegressor": {
+                 "learning_rate": [0.01, 0.05, 0.1],
+                "n_estimators": [8, 16, 32, 64, 128, 256]
+                },
+
+                "CatBoosting Regressor": {
+                "depth": [6, 8, 10],
+                "learning_rate": [0.01, 0.05, 0.1],
+                "iterations": [30, 50, 100]
+                },
+
+                "AdaBoost Regressor": {
+                "learning_rate": [0.01, 0.05, 0.1],
+                "n_estimators": [8, 16, 32, 64, 128, 256]
+                },
+
+                "KNeighbors Regressor": {
+                "n_neighbors": [3, 5, 7, 9]
+                 }
+                }
+
+            model_report:dict=evaluate_model(X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,models=models,param=params)
 
             ##to get the best model from dict
 
